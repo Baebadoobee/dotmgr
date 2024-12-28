@@ -182,13 +182,13 @@ function Export-Dotfiles {
         [string[]]$Path = (".\.config\alacritty", ".\.config\hypr", ".\.config\neofetch", ".\.config\wal", ".\.config\waybar", ".\.config\waypaper", ".\.config\wofi", ".\.config\btop", ".\.config\cava"),
 
         [Parameter(Position = 1, Mandatory = $false)]  # You may change the default repository name.
-        [string[]]$Destination = ".\git\dotfiles\hypr",
+        [string[]]$Destination = ".\.dotfiles\",
 
         [Parameter(Position = 2, Mandatory = $false)] # Repository name
         [string]$Name,
 
         [Parameter(Position = 3, Mandatory = $false)] # Repository path
-        [string]$RepositoryPath = ".\git\dotfiles\$Name",
+        [string]$RepositoryPath = ".\.dotfiles\$Name",
 
         [Parameter(Position = 4, Mandatory = $false)] # Full installation switch
         [switch]$Full,
@@ -201,6 +201,10 @@ function Export-Dotfiles {
         $ErrorActionPreference = "Stop";
         $date = Get-Date -Format "yyyy-MM-dd";
         $Referenced_Destination = "$Destination";
+        if (-not (Test-Path "$Referenced_Destination")) {# Verify repository folder on computer.
+            Write-Host "`nCreating directory: $Destination.";
+            New-Item -Path "$Referenced_Destination" -ItemType Directory -Force;
+        }
         if ($Full) { # Variables for a full export. You can set that as you want.
             $AdditionalPath = "\usr\lib\sddm\sddm.conf.d", "\usr\share\sddm\themes", ".\.bashrc", "\bin\neofetch";
             $AdditionalDestination = "$Referenced_Destination\sddm\", "$Referenced_Destination\sddm\", "$Referenced_Destination", "$Referenced_Destination\bin\";
@@ -227,7 +231,7 @@ function Export-Dotfiles {
                 Push-Location $Referenced_Destination;    
                 git add .;
                 git commit -m "Dotfiles from $date";
-                git push -u origin main;
+                git push -u origin main; #You must set the branch here
                 Pop-Location;
             }
         }
@@ -311,7 +315,7 @@ function Install-Dotfiles {
         [string]$Name,
 
         [Parameter(Position = 3, Mandatory = $false)] # Repository path
-        [string]$RepositoryPath = ".\git\dotfiles\$Name",
+        [string]$RepositoryPath = ".\.dotfiles\$Name",
 
         [Parameter(Position = 4, Mandatory = $false)] # Full installation switch
         [switch]$Full
@@ -319,7 +323,9 @@ function Install-Dotfiles {
 
     begin {
         $ErrorActionPreference = "Stop";
-        $Referenced_Path = "$Path";
+        if ($Name) {$Referenced_Path = "$RepositoryPath\$Path"} 
+        else {$Referenced_Path = "$Path"}
+
         if ($Full) { # Variables for a full installation. You can set that as you want.
             $AditionalDestination = "\usr\lib\sddm\", "\usr\share\sddm\", ".", "\bin\";
             $AditionalPath = "$Referenced_Path\sddm\sddm.conf.d", "$Referenced_Path\sddm\themes", "$Referenced_Path\.bashrc"; "$Referenced_Path\bin\neofetch";
@@ -328,7 +334,6 @@ function Install-Dotfiles {
 
     process {
         $action = "Config files installation";
-        if ($Name) { $Referenced_Path = "$RepositoryPath\$Path" }
         try {
             # Config files (default) installation.
             Write-Host "`n$action`n" -BackgroundColor DarkGray;
