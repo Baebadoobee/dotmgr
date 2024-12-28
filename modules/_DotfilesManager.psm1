@@ -231,7 +231,7 @@ function Export-Dotfiles {
                 Push-Location $Referenced_Destination;    
                 git add .;
                 git commit -m "Dotfiles from $date";
-                git push -u origin main; #You must set the branch here
+                git push -u origin master; #You must set the branch here
                 Pop-Location;
             }
         }
