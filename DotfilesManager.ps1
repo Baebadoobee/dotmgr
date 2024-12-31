@@ -1,5 +1,11 @@
 # install-module Microsoft.PowerShell.ConsoleGuiTools
 Import-Module ".\code\dotmgr\modules\_DotfilesManager.psm1";
+
+#Set the files/folders and the destination of each simbolic link in your configs. 
+$itensToLink
+$linkDestination = "";
+
+
 do {
     Clear-Host;
     Write-Host "
